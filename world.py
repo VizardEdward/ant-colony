@@ -2,33 +2,29 @@ import numpy as np
 
 
 class World:
-    def __init__(self):
-        self.pheromones = np.zeros((8, 8))
-        self.PATHS = np.zeros((8, 8))
+    def __init__(self, nodes_number, globally_pheromones=None, evaporation=0.1):
+        self.pheromones = np.zeros((nodes_number, nodes_number))
+        self.graph = np.zeros((nodes_number, nodes_number))
+        self.globally_pheromones = globally_pheromones
+        self.evaporation = evaporation
 
-        self.PATHS[1][2] = self.PATHS[2][1] = 5
-        self.PATHS[1][3] = self.PATHS[3][1] = 3.1
-        self.PATHS[1][6] = self.PATHS[6][1] = 5.2
-        self.PATHS[2][3] = self.PATHS[3][2] = 4.9
-        self.PATHS[2][7] = self.PATHS[7][2] = 5.2
-        self.PATHS[3][5] = self.PATHS[5][3] = 3.7
-        self.PATHS[3][6] = self.PATHS[6][3] = 3.2
-        self.PATHS[3][7] = self.PATHS[7][3] = 3
-        self.PATHS[5][4] = self.PATHS[4][5] = 5.5
-        self.PATHS[5][6] = self.PATHS[6][5] = 4.7
-        self.PATHS[7][4] = self.PATHS[4][7] = 4.8
+    def evaporate(self):
+        self.pheromones = self.pheromones * (1 - self.evaporation)
 
-        self.pheromones[1][2] = self.pheromones[2][1] = 0.1
-        self.pheromones[1][3] = self.pheromones[3][1] = 0.1
-        self.pheromones[1][6] = self.pheromones[6][1] = 0.1
-        self.pheromones[2][3] = self.pheromones[3][2] = 0.1
-        self.pheromones[2][7] = self.pheromones[7][2] = 0.1
-        self.pheromones[3][5] = self.pheromones[5][3] = 0.1
-        self.pheromones[3][6] = self.pheromones[6][3] = 0.1
-        self.pheromones[3][7] = self.pheromones[7][3] = 0.1
-        self.pheromones[5][4] = self.pheromones[4][5] = 0.1
-        self.pheromones[5][6] = self.pheromones[6][5] = 0.1
-        self.pheromones[7][4] = self.pheromones[4][7] = 0.1
+    def update_pheromones(self, path, pheromones):
+        for x, y in path:
+            self.pheromones[x][y] = self.pheromones[x][y] + pheromones
+            self.pheromones[y][x] = self.pheromones[y][x] + pheromones
 
-    def update_pheromones(self, evaporation):
-        self.pheromones = self.pheromones * (1-evaporation)
+    def set_graph_info(self, node_1, node_2, weight, pheromones=None):
+        self.graph[node_1][node_2] = weight
+        self.graph[node_2][node_1] = weight
+        self.set_pheromones(node_1, node_2, pheromones)
+
+    def set_pheromones(self, node_1, node_2, pheromones=None):
+        if not pheromones:
+            self.pheromones[node_1][node_2] = self.globally_pheromones
+            self.pheromones[node_2][node_1] = self.globally_pheromones
+        else:
+            self.pheromones[node_1][node_2] = pheromones
+            self.pheromones[node_2][node_1] = pheromones
