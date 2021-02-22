@@ -1,5 +1,6 @@
 from ant import Ant
 from world import World
+import matplotlib.pyplot as plt
 
 
 def read_world():
@@ -18,22 +19,38 @@ def read_world():
     return world
 
 
-def update_pheromones(world, ants: list):
+def update_pheromones(world, ants):
     world.evaporate()
+    ant_minim = ants[0]
     for ant in ants:
-        world.update_pheromones(ant.path, ant.get_pheromone())
+        if ant_minim.total_cost > ant.total_cost:
+            ant_minim = ant
+    world.update_pheromones(ant_minim.path, ant_minim.get_pheromone())
 
 
-def run(world, ants_number, iterations, origin, destiny, alpha=1, beta=1):
-    for iter in range(iterations):
+def plot(y):
+    plt.plot(range(1, len(y) + 1), y)
+    plt.xlabel("Iteracion")
+    plt.ylabel("Costo minimo")
+    plt.show()
+
+
+def run(world, ants_number, iterations, origin, destiny, learning=1, alpha=1, beta=1):
+    min_list = []
+    for _ in range(iterations):
         ants_list = []
-        for ant in range(ants_number):
-            ant = Ant(world, origin, alpha, beta)
-            ant.find_destiny(destiny)
+        cost_list = []
+        for _ in range(ants_number):
+            ant = Ant(world, origin - 1, alpha, beta, learning)
+            ant.find_destiny(destiny - 1)
             ants_list.append(ant)
+            cost_list.append(ant.total_cost)
+        min_cost = min(cost_list)
+        min_list.append(min_cost)
         update_pheromones(world, ants_list)
+    plot(min_list)
 
 
 if __name__ == "__main__":
     world = read_world()
-    run(world, ants_number=1, iterations=1, origin=1, destiny=4)
+    run(world, ants_number=1, iterations=1, origin=1, destiny=4, learning=1)
