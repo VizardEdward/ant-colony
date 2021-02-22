@@ -24,8 +24,8 @@ def update_pheromones(world, ants: list):
         world.update_pheromones(ant.path, ant.get_pheromone())
 
 
-def run(world, ants_number, iteration, origin, destiny, alpha=1, beta=1):
-    for iter in range(iteration):
+def run(world, ants_number, iterations, origin, destiny, alpha=1, beta=1):
+    for iter in range(iterations):
         ants_list = []
         for ant in range(ants_number):
             ant = Ant(world, origin, alpha, beta)
@@ -36,4 +36,4 @@ def run(world, ants_number, iteration, origin, destiny, alpha=1, beta=1):
 
 if __name__ == "__main__":
     world = read_world()
-    run(world, 1, 1, 1, 4)
+    run(world, ants_number=1, iterations=1, origin=1, destiny=4)
