@@ -1,3 +1,8 @@
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
 from ant import Ant
 from world import World
 import matplotlib.pyplot as plt
@@ -22,7 +27,7 @@ def read_world():
 def update_pheromones(world, ants):
     world.evaporate()
     ant_minim = ants[0]
-    for ant in ants:        
+    for ant in ants:
         # if ant_minim.total_cost > ant.total_cost:
         #     ant_minim = ant
         world.update_pheromones(ant.path, ant.get_pheromone())
@@ -31,8 +36,8 @@ def update_pheromones(world, ants):
 
 def plot(y):
     plt.plot(range(1, len(y) + 1), y)
-    plt.xlabel("Iteracion")
-    plt.ylabel("Costo minimo")
+    plt.xlabel("Iteración")
+    plt.ylabel("Costo mínimo")
     plt.show()
 
 
@@ -46,14 +51,19 @@ def run(world, ants_number, iterations, origin, destiny, learning=1, alpha=1, be
             ant.find_destiny(destiny - 1)
             ants_list.append(ant)
             cost_list.append(ant.total_cost)
-        print(cost_list)
         min_cost = min(cost_list)
         min_list.append(min_cost)
         update_pheromones(world, ants_list)
-    print(min_list)
-    plot(min_list)
+    plot(min_list   )
 
 
 if __name__ == "__main__":
+    if os.environ.get("SKIP_DOTENV", "") != "1":
+        load_dotenv(dotenv_path=Path('.') / '.env')
     world = read_world()
-    run(world, ants_number=2, iterations=1000, origin=1, destiny=4, learning=1)
+    ANT_NUMBERS = int(os.environ.get("ANT_NUMBERS", 3))
+    ITERATIONS_NUMBER = int(os.environ.get("ITERATIONS_NUMBER", 1000))
+    ORIGIN = int(os.environ.get("ORIGIN", 1))
+    DESTINY = int(os.environ.get("DESTINY", 4))
+    LEARNING = float(os.environ.get("LEARNING", 1))
+    run(world, ants_number=ANT_NUMBERS, iterations=ITERATIONS_NUMBER, origin=ORIGIN, destiny=DESTINY, learning=LEARNING)
